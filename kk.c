@@ -1,2 +1,3 @@
-int i=5;
-printf("%d",i);
+int j=7;
+printf("%d",j);
+printf("ppg");

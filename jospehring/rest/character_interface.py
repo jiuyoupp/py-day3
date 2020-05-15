@@ -4,8 +4,7 @@ from jospehring.usecase.interface import Interface
 class CharacterInterface(Interface):
     def execute(self):
         while True:
-            for index, item in enumerate(self.option_list, 1):
-                print(index, item[0])
+            self.show_menu()
             choice = input('请输入您选择的序号').strip()
             if choice.isdecimal() and 1 <= int(choice) <= len(self.option_list):
                 choice = int(choice)

@@ -1,7 +1,6 @@
 from jospehring.usecase.interface import Interface
 from jospehring.domain.ring import Ring
 from jospehring.usecase.reader_use_case import read_data
-from jospehring.usecase.reader import ZipReader
 from PySide2.QtWidgets import QApplication, QWidget, QDialog
 from jospehring.rest.ui_main import Ui_Form
 from jospehring.rest.child import Ui_Dialog
@@ -24,7 +23,7 @@ class MyMainWindow(QWidget, Ui_Form, Interface):
 
     def next_people(self):
         outperson = self.jospeh.next()
-        c = outperson.name+str(outperson.num)
+        c = outperson.name + str(outperson.num)
         self.textEdit.setPlainText (c)
 
     def exit(self):
@@ -34,8 +33,9 @@ class MyMainWindow(QWidget, Ui_Form, Interface):
     def reset(self):
 
         dialog = ChildWindow(self)
+        dialog.comboBox.clear()
         dialog.exec_()
-        step, location = dialog.get_data()
+        step, location = dialog.reset_data()
         step = int(step)
         location = int(location)
         dialog.destroy()
@@ -47,16 +47,15 @@ class MyMainWindow(QWidget, Ui_Form, Interface):
 
     def create_jospehring(self, obj=Ring, start=0, location=0):
         self.jospeh = obj()
-        readdata = ZipReader()
-        reader = read_data(readdata, 'D:\pythoncode\josphering\data\peopledata.zip', 'r')
-        self.jospeh.from_reader(reader)
         if self.jospeh:
             dialog = ChildWindow(self)
             dialog.exec_()
-            step, location = dialog.get_data()
+            step, location, path = dialog.get_data()
             step = int(step)
             location = int(location)
             dialog.destroy()
+            reader = read_data(path, 'r')
+            self.jospeh.from_reader(reader)
             self.jospeh.reset(step, location)
 
     def next_people(self):
@@ -97,13 +96,16 @@ class ChildWindow(QDialog, Ui_Dialog):
         super(ChildWindow, self).__init__(parent)
         self.setupUi(self)
 
-
     def get_data(self):
         text1 = self.lineEdit.text()
         text2 = self.lineEdit_2.text()
+        path = self.comboBox.currentText()
+        return text1, text2, path
+
+    def reset_data(self):
+        text1 = self.lineEdit.text()
+        text2 = self.lineEdit_2.text()
         return text1, text2
-
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)

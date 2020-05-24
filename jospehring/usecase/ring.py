@@ -1,5 +1,5 @@
-from typing import List
-from person import Person
+from typing import List, Iterator, Generator
+from jospehring.domain.person import Person
 import copy
 
 
@@ -15,7 +15,7 @@ class Ring(object):
         self._current_id = 0
 
     # 依赖注入使得内层能够调用外层
-    def from_reader(self, reader: List[Person]):
+    def from_reader(self, reader: List[Person]) -> None:
         if reader:
             for each in reader:
                 self._ring.append(each)
@@ -23,7 +23,7 @@ class Ring(object):
     def is_empty(self) -> bool:
         return len(self._temp) == 0
 
-    def pop(self, index: int):
+    def pop(self, index: int) -> Person:
         return self._ring.pop(index)
 
     def query_list(self):
@@ -45,12 +45,27 @@ class Ring(object):
         self._current_id += (self.step - 1)
         return outelem
 
-    def popelem(self):
+    def __iter__(self) -> Iterator:
+        return self
+
+    def __next__(self) -> Person:
+        if not self._temp:
+            raise StopIteration
+        size = len(self._temp)
+        self._current_id = (self._current_id + (self.step - 1)) % size
+        outelem = self._temp.pop(self._current_id)
+        return outelem
+
+    def __len__(self):
+        return len(self._temp)
+
+    def popelem(self) -> Generator:
         step = self.step
         temp = self._temp
-        location = self.start % len(temp)
         if self.is_empty() is True:
             raise Exception('环为空')
+        location = self.start % len(temp)
+
 
         for each in range(0, len(temp)):
             location = (location + (step-1)) % len(temp)

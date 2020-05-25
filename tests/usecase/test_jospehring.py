@@ -1,14 +1,14 @@
-from t2 import Ring, Person
-import pytest
+from jospehring.domain.person import Person
+from jospehring.usecase.ring import Ring
 
 
 def test_ring_init():
     jospeh = Ring()
     assert jospeh.start == 0
     assert jospeh.step == 1
-
-# def test_from_reader():
-#     jospeh = Ring.from_reader()
+    assert jospeh._ring ==[]
+    assert jospeh._temp == []
+    assert jospeh._current_id == 0
 
 
 def test_ring_reset():
@@ -24,6 +24,13 @@ def test_ring_pop():
     jospeh.append(person1)
     outelem = jospeh.pop(0)
     assert person1 == outelem
+
+
+def test_josephus_append():
+    jos = Ring()
+    person = Person('Bob', 12)
+    jos.append(person)
+    assert jos._ring == [person]
 
 
 def test_ring_query():
@@ -47,9 +54,9 @@ def test_ring_popelem():
         jospeh.append(person)
     jospeh.reset(step=1, location=1)  # start = location-1
     # temp采用了拷贝得到的perosn实例与原来不同
-    outperson1 = jospeh.next()
-    outperson2 = jospeh.next()
-    outperson3 = jospeh.next()
+    outperson1 = next(jospeh)
+    outperson2 = next(jospeh)
+    outperson3 = next(jospeh)
 
     assert outperson1.name == person1.name
     assert outperson1.num == person1.num
@@ -59,6 +66,20 @@ def test_ring_popelem():
     assert outperson3.num == person3.num
 
 
-if __name__ == '__main__':
-    pytest.main(['test_jospehring.py'])
+def test_is_empty():
+    jos = Ring()
+    judgeempty = jos.is_empty()
+    assert judgeempty is True
+
+
+def test_from_reader():
+    person1 = Person(name='jack', number=13)
+    person2 = Person(name='lili', number=18)
+    person3 = Person(name='david', number=20)
+    people = [person1, person2, person3]
+    jospeh = Ring()
+    jospeh.from_reader(people)
+    assert jospeh._ring == people
+
+
 
